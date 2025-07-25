@@ -4,7 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
-  
+   
 // Add JWT Authentication
 builder.Services.AddAuthentication(options =>
 {
