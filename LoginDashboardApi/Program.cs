@@ -7,7 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
    
 // Add JWT Authentication
 builder.Services.AddAuthentication(options =>
-{
+{ 
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 }).AddJwtBearer(options =>
