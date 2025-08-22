@@ -1,10 +1,16 @@
 using AspNetCoreRateLimit;
+using LoginDashboardApi.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System;
 using System.Text; 
 
 var builder = WebApplication.CreateBuilder(args);
-   
+
+builder.Services.AddDbContext<userDbContext>(options =>
+    options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"),
+        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))));
 // Add JWT Authentication
 builder.Services.AddAuthentication(options =>
 { 

@@ -4,6 +4,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using LoginDashboardApi.DTO;
+using LoginDashboardApi.Data;
 
 namespace LoginDashboardApi.Controllers
 {
@@ -12,46 +14,30 @@ namespace LoginDashboardApi.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IConfiguration _config;
+        private readonly userDbContext _context;
 
-        public AuthController(IConfiguration config)
+        //public AuthController(IConfiguration config)
+        //{
+        //    _config = config;
+        //}
+
+        public AuthController(userDbContext context)
         {
-            _config = config;
+            _context = context;
         }
-
-        // Hardcoded user list
-        private List<User> users = new List<User>
-        {
-            new User { Username = "admin", Password = "1234" }
-        };
 
         [HttpPost("login")]
-        public IActionResult Login([FromBody] User user)
+        public IActionResult Login([FromBody] LoginRequest request)
         {
-            var validUser = users.FirstOrDefault(u => u.Username == user.Username && u.Password == user.Password);
-            if (validUser == null)
-                return Unauthorized("Invalid username or password");
-
-            var token = GenerateJwtToken(validUser.Username);
-            return Ok(new { token });
-        }
-
-        private string GenerateJwtToken(string username)
-        {
-            var key = Encoding.ASCII.GetBytes(_config["Jwt:Key"]);
-            var tokenHandler = new JwtSecurityTokenHandler();
-
-            var tokenDescriptor = new SecurityTokenDescriptor
+            var user = _context.Users
+                .FirstOrDefault(u => u.Username == request.Username && u.Password == request.Password);
+            if (user == null)
             {
-                Subject = new ClaimsIdentity(new[] {
-                    new Claim(ClaimTypes.Name, username)
-                }),
-                Expires = DateTime.UtcNow.AddHours(1),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
-                                  SecurityAlgorithms.HmacSha256Signature)
-            };
+                return Unauthorized(new { message = "Invalid username or password" });
 
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
+            }
+            return Ok(new { message = "Login Successful" });
+        
         }
     }
 }
